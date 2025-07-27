@@ -1,5 +1,8 @@
 {
-  "name": "discord-profile-bot",
+  "name": "profile-bot",
   "version": "1.0.0",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "discord-interactions": "^4.2.0"
+  }
 }
