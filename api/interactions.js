@@ -1,20 +1,45 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Method not allowed");
+import { InteractionType, verifyKey } from 'discord-interactions';
 
-  const { type, data, member } = req.body;
+const PUBLIC_KEY = 'YOUR_DISCORD_PUBLIC_KEY'; // Replace this!
 
-  // PING = 1 (handshake), APPLICATION_COMMAND = 2 (slash command)
-  if (type === 1) return res.status(200).json({ type: 1 });
+export default async (req, res) => {
+  const signature = req.headers['x-signature-ed25519'];
+  const timestamp = req.headers['x-signature-timestamp'];
+  const rawBody = await getRawBody(req);
 
-  if (type === 2 && data.name === "howgay") {
+  const isValidRequest = verifyKey(rawBody, signature, timestamp, PUBLIC_KEY);
+
+  if (!isValidRequest) {
+    return res.status(401).send('Bad request signature.');
+  }
+
+  const interaction = JSON.parse(rawBody.toString());
+
+  // Respond to ping
+  if (interaction.type === InteractionType.PING) {
+    return res.status(200).json({ type: InteractionType.PING });
+  }
+
+  // Respond to /howgay
+  if (
+    interaction.type === InteractionType.APPLICATION_COMMAND &&
+    interaction.data.name === 'howgay'
+  ) {
     const percent = Math.floor(Math.random() * 101);
     return res.status(200).json({
       type: 4,
-      data: {
-        content: `🌈 You are ${percent}% gay!`
-      }
+      data: { content: `🌈 You are ${percent}% gay!` },
     });
   }
 
-  res.status(400).send("Bad request");
+  return res.status(400).send('Unknown interaction type.');
+};
+
+async function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', chunk => (data += chunk));
+    req.on('end', () => resolve(Buffer.from(data)));
+    req.on('error', reject);
+  });
 }
