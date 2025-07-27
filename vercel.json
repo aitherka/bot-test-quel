@@ -4,6 +4,9 @@
     { "src": "api/interactions.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/interactions", "dest": "api/interactions.js" }
+    {
+      "src": "/interactions",
+      "dest": "api/interactions.js"
+    }
   ]
 }
