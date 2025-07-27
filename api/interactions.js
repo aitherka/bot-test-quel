@@ -1,6 +1,6 @@
 import { InteractionType, verifyKey } from 'discord-interactions';
 
-const PUBLIC_KEY = 'YOUR_DISCORD_PUBLIC_KEY'; // Replace this!
+const PUBLIC_KEY = 'c98b843d6b260378cb07c118ae6d8a76d085026349964bb2af951af627470800'; // Replace this!
 
 export default async (req, res) => {
   const signature = req.headers['x-signature-ed25519'];
